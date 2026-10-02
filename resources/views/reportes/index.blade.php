@@ -66,6 +66,7 @@
                 <label>Grupo</label>
                 <select name="grupo" class="select2" data-placeholder="Todos los grupos">
                     <option value=""></option>
+                    <option value="__SIN_GRUPO__" @selected(request('grupo') === '__SIN_GRUPO__')>NO CATALOGADO</option>
                     @foreach($grupos as $g)
                         <option value="{{ $g }}" @selected(request('grupo') === $g)>{{ $g }}</option>
                     @endforeach
@@ -148,7 +149,7 @@
 
                         <td><span class="cell-title">{{ $s->sucursal->nombre }}</span></td>
                         <td>{{ $s->usuario->name }}</td>
-                        <td>{{ $s->grupo?->nombre ?? $s->item?->grupo ?? '—' }}</td>
+                        <td>{{ $s->grupo?->nombre ?? $s->item?->grupo ?? 'NO CATALOGADO' }}</td>
                         <td>{{ $s->color?->nombre ?? $s->item?->color ?? '—' }}</td>
                         <td><strong>{{ $s->talle?->nombre ?? $s->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $s->observacion ?: 'Sin observación' }}</td>

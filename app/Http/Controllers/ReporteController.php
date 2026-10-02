@@ -68,7 +68,7 @@ class ReporteController extends Controller
                     $solicitud->created_at->format('d/m/Y H:i:s'),
                     $solicitud->sucursal->nombre,
                     $solicitud->usuario->name,
-                    $solicitud->grupo?->nombre ?? $solicitud->item?->grupo ?? '',
+                    $solicitud->grupo?->nombre ?? $solicitud->item?->grupo ?? 'NO CATALOGADO',
                     $solicitud->color?->nombre ?? $solicitud->item?->color ?? '',
                     $solicitud->talle?->nombre ?? $solicitud->item?->talle ?? '',
                     $solicitud->observacion,
@@ -119,7 +119,11 @@ class ReporteController extends Controller
         }
 
         if ($request->filled('grupo')) {
-            $query->whereHas('grupo', fn ($q) => $q->where('nombre', $request->grupo));
+            if ($request->grupo === '__SIN_GRUPO__') {
+                $query->whereNull('grupo_id');
+            } else {
+                $query->whereHas('grupo', fn ($q) => $q->where('nombre', $request->grupo));
+            }
         }
 
         if ($request->filled('color')) {

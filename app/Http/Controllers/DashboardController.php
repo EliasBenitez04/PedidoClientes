@@ -27,6 +27,10 @@ class DashboardController extends Controller
                 ->whereNotNull('grupo_id')
                 ->distinct()
                 ->count('grupo_id'),
+            'sin_grupo' => (clone $base)
+                ->where('created_at', '>=', $inicioMes)
+                ->whereNull('grupo_id')
+                ->count(),
             'revisados' => (clone $base)
                 ->where('created_at', '>=', $inicioMes)
                 ->where('estado', 'REVISADO')
@@ -41,18 +45,18 @@ class DashboardController extends Controller
 
         $topCombinaciones = SolicitudCliente::query()
             ->from('solicitudes_clientes as s')
-            ->join('grupo as g', 'g.id', '=', 's.grupo_id')
+            ->leftJoin('grupo as g', 'g.id', '=', 's.grupo_id')
             ->join('color as c', 'c.id', '=', 's.color_id')
             ->join('talle as t', 't.id', '=', 's.talle_id')
             ->when(!$user->puedeVerTodo(), fn ($q) => $q->where('s.sucursal_id', $user->sucursal_id))
             ->where('s.created_at', '>=', $inicioMes)
-            ->select([
-                'g.nombre as grupo',
+            ->selectRaw("COALESCE(g.nombre, 'NO CATALOGADO') as grupo")
+            ->addSelect([
                 'c.nombre as color',
                 't.nombre as talle',
                 DB::raw('COUNT(*) as cantidad'),
             ])
-            ->groupBy('g.nombre', 'c.nombre', 't.nombre')
+            ->groupByRaw("COALESCE(g.nombre, 'NO CATALOGADO'), c.nombre, t.nombre")
             ->orderByDesc('cantidad')
             ->limit(8)
             ->get();

@@ -100,7 +100,7 @@
 
                         <td><span class="cell-title">{{ $s->sucursal->nombre }}</span></td>
                         <td>{{ $s->usuario->name }}</td>
-                        <td><span class="cell-title">{{ $s->grupo?->nombre ?? $s->item?->grupo ?? '—' }}</span></td>
+                        <td><span class="cell-title">{{ $s->grupo?->nombre ?? $s->item?->grupo ?? 'NO CATALOGADO' }}</span></td>
                         <td>{{ $s->color?->nombre ?? $s->item?->color ?? '—' }}</td>
                         <td><strong>{{ $s->talle?->nombre ?? $s->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $s->observacion ?: 'Sin observación' }}</td>

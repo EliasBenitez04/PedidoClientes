@@ -46,10 +46,14 @@ class SolicitudClienteController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'grupo_id' => ['required', 'integer', 'exists:grupo,id'],
+            'grupo_id' => ['nullable', 'integer', 'exists:grupo,id'],
             'color_id' => ['required', 'integer', 'exists:color,id'],
             'talle_id' => ['required', 'integer', 'exists:talle,id'],
-            'observacion' => ['nullable', 'string', 'max:2000'],
+            'observacion' => ['required_without:grupo_id', 'nullable', 'string', 'max:2000'],
+        ], [
+            'color_id.required' => 'El color es obligatorio.',
+            'talle_id.required' => 'El talle es obligatorio.',
+            'observacion.required_without' => 'Si el grupo no está disponible, escribí en Observación qué producto pidió el cliente.',
         ]);
 
         $user = auth()->user();
@@ -60,20 +64,29 @@ class SolicitudClienteController extends Controller
             ]);
         }
 
-        $grupo = CatalogoGrupo::whereKey($data['grupo_id'])->where('activo', true)->first();
+        $grupo = !empty($data['grupo_id'])
+            ? CatalogoGrupo::whereKey($data['grupo_id'])->where('activo', true)->first()
+            : null;
+
         $color = CatalogoColor::whereKey($data['color_id'])->where('activo', true)->first();
         $talle = CatalogoTalle::whereKey($data['talle_id'])->where('activo', true)->first();
 
-        if (!$grupo || !$color || !$talle) {
+        if (!empty($data['grupo_id']) && !$grupo) {
             return back()->withInput()->withErrors([
-                'catalogo' => 'Uno de los valores seleccionados ya no está disponible.',
+                'grupo_id' => 'El grupo seleccionado ya no está disponible. Podés dejar Grupo vacío y describir lo solicitado en Observación.',
+            ]);
+        }
+
+        if (!$color || !$talle) {
+            return back()->withInput()->withErrors([
+                'catalogo' => 'El color o talle seleccionado ya no está disponible.',
             ]);
         }
 
         $solicitud = SolicitudCliente::create([
             'user_id' => $user->id,
             'sucursal_id' => $user->sucursal_id,
-            'grupo_id' => $grupo->id,
+            'grupo_id' => $grupo?->id,
             'color_id' => $color->id,
             'talle_id' => $talle->id,
             'catalogo_item_id' => null,

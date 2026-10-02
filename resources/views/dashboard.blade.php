@@ -38,7 +38,7 @@
 
     <div class="kpi-card kpi-warning">
         <div class="kpi-top">
-            <span class="kpi-label">Grupos solicitados</span>
+            <span class="kpi-label">Grupos solicitados <small style="display:block;font-weight:500;color:#98a2b3">Sin catalogar: {{ $kpis['sin_grupo'] }}</small></span>
             <span class="kpi-icon">G</span>
         </div>
         <div class="kpi-value">{{ $kpis['grupos_mes'] }}</div>
@@ -167,7 +167,7 @@
                             <span class="cell-meta">{{ $s->created_at->format('H:i') }}</span>
                         </td>
                         <td>{{ $s->sucursal->nombre }}</td>
-                        <td><span class="cell-title">{{ $s->grupo?->nombre ?? $s->item?->grupo ?? '—' }}</span></td>
+                        <td><span class="cell-title">{{ $s->grupo?->nombre ?? $s->item?->grupo ?? 'NO CATALOGADO' }}</span></td>
                         <td>{{ $s->color?->nombre ?? $s->item?->color ?? '—' }}</td>
                         <td><strong>{{ $s->talle?->nombre ?? $s->item?->talle ?? '—' }}</strong></td>
                         <td><span class="badge badge-{{ strtolower($s->estado) }}">{{ $s->estado }}</span></td>
