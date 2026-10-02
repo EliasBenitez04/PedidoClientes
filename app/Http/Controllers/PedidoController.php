@@ -37,9 +37,9 @@ class PedidoController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'grupo_id' => ['required', 'integer', 'exists:catalogo_grupos,id'],
-            'color_id' => ['required', 'integer', 'exists:catalogo_colores,id'],
-            'talle_id' => ['required', 'integer', 'exists:catalogo_talles,id'],
+            'grupo_id' => ['required', 'integer', 'exists:grupo,id'],
+            'color_id' => ['required', 'integer', 'exists:color,id'],
+            'talle_id' => ['required', 'integer', 'exists:talle,id'],
             'observacion' => ['nullable', 'string', 'max:2000'],
         ]);
 

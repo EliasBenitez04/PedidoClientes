@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CatalogoGrupo extends Model
 {
-    protected $table = 'catalogo_grupos';
+    protected $table = 'grupo';
     protected $fillable = ['nombre', 'activo'];
     protected $casts = ['activo' => 'boolean'];
 

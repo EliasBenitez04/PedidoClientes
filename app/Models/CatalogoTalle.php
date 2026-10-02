@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CatalogoTalle extends Model
 {
-    protected $table = 'catalogo_talles';
+    protected $table = 'talle';
     protected $fillable = ['nombre', 'activo'];
     protected $casts = ['activo' => 'boolean'];
 

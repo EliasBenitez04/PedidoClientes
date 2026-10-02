@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class CatalogoColor extends Model
 {
-    protected $table = 'catalogo_colores';
+    protected $table = 'color';
     protected $fillable = ['nombre', 'activo'];
     protected $casts = ['activo' => 'boolean'];
 
