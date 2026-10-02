@@ -14,13 +14,20 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
+        $data = $request->validate([
+            'username' => ['required', 'string', 'max:80'],
             'password' => ['required', 'string'],
         ]);
 
-        if (!Auth::attempt($credentials, $request->boolean('remember'))) {
-            return back()->withErrors(['email' => 'Credenciales incorrectas.'])->onlyInput('email');
+        $username = strtoupper(trim($data['username']));
+
+        if (!Auth::attempt([
+            'username' => $username,
+            'password' => $data['password'],
+        ], $request->boolean('remember'))) {
+            return back()
+                ->withErrors(['username' => 'Usuario o contraseña incorrectos.'])
+                ->onlyInput('username');
         }
 
         $request->session()->regenerate();
@@ -28,7 +35,11 @@ class AuthController extends Controller
         if (!Auth::user()->activo) {
             Auth::logout();
             $request->session()->invalidate();
-            return back()->withErrors(['email' => 'Este usuario está inactivo.']);
+            $request->session()->regenerateToken();
+
+            return back()->withErrors([
+                'username' => 'Este usuario está inactivo.',
+            ]);
         }
 
         return redirect()->intended(route('dashboard'));

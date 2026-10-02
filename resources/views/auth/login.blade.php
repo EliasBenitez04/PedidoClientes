@@ -13,18 +13,38 @@
     <section class="login-panel">
         <div class="login-card">
             <h1>Bienvenido</h1>
-            <p class="intro">Ingresá con tu usuario para acceder al sistema.</p>
+            <p class="intro">Ingresá con el usuario asignado a tu tienda.</p>
 
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
+
                 <div class="field">
-                    <label for="email">Correo electrónico</label>
-                    <input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="usuario@empresa.com" required autofocus>
+                    <label for="username">Usuario</label>
+                    <input
+                        id="username"
+                        type="text"
+                        name="username"
+                        value="{{ old('username') }}"
+                        placeholder="Ej.: TIENDA01"
+                        maxlength="80"
+                        autocomplete="username"
+                        style="text-transform:uppercase"
+                        required
+                        autofocus
+                    >
+                    <small class="field-hint">No necesitás correo electrónico para ingresar.</small>
                 </div>
 
                 <div class="field">
                     <label for="password">Contraseña</label>
-                    <input id="password" type="password" name="password" placeholder="Ingresá tu contraseña" required>
+                    <input
+                        id="password"
+                        type="password"
+                        name="password"
+                        placeholder="Ingresá tu contraseña"
+                        autocomplete="current-password"
+                        required
+                    >
                 </div>
 
                 <label style="display:flex;align-items:center;gap:8px;font-weight:500;margin:4px 0 18px;color:#667085">
@@ -35,8 +55,21 @@
                 <button class="btn btn-primary btn-lg" style="width:100%" type="submit">Ingresar al sistema</button>
             </form>
 
-            <div class="login-footer">Pedido Clientes · Acceso seguro por usuario</div>
+            <div class="login-footer">Pedido Clientes · Acceso por usuario de tienda</div>
         </div>
     </section>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const username = document.getElementById('username');
+    if (username) {
+        username.addEventListener('input', function () {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');
+        });
+    }
+});
+</script>
+@endpush

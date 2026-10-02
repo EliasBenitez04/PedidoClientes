@@ -9,13 +9,40 @@ class User extends Authenticatable
 {
     use Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'rol', 'sucursal_id', 'activo'];
+    protected $fillable = [
+        'name',
+        'username',
+        'email',
+        'password',
+        'rol',
+        'sucursal_id',
+        'activo',
+    ];
+
     protected $hidden = ['password', 'remember_token'];
-    protected $casts = ['email_verified_at' => 'datetime', 'activo' => 'boolean'];
 
-    public function sucursal() { return $this->belongsTo(Sucursal::class); }
-    public function pedidos() { return $this->hasMany(Pedido::class); }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'activo' => 'boolean',
+    ];
 
-    public function esAdmin(): bool { return $this->rol === 'ADMIN'; }
-    public function puedeVerTodo(): bool { return in_array($this->rol, ['ADMIN', 'SUPERVISOR'], true); }
+    public function sucursal()
+    {
+        return $this->belongsTo(Sucursal::class);
+    }
+
+    public function pedidos()
+    {
+        return $this->hasMany(Pedido::class);
+    }
+
+    public function esAdmin(): bool
+    {
+        return $this->rol === 'ADMIN';
+    }
+
+    public function puedeVerTodo(): bool
+    {
+        return in_array($this->rol, ['ADMIN', 'SUPERVISOR'], true);
+    }
 }

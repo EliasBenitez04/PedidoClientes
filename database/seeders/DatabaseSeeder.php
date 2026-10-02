@@ -16,10 +16,13 @@ class DatabaseSeeder extends Seeder
             ['nombre' => 'CASA CENTRAL', 'activo' => true]
         );
 
+        $username = strtoupper(env('ADMIN_USERNAME', 'ADMIN'));
+
         User::updateOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@pedidos.local')],
+            ['username' => $username],
             [
                 'name' => env('ADMIN_NAME', 'Administrador'),
+                'email' => env('ADMIN_EMAIL') ?: null,
                 'password' => Hash::make(env('ADMIN_PASSWORD', 'Cambiar123!')),
                 'rol' => 'ADMIN',
                 'sucursal_id' => $central->id,
