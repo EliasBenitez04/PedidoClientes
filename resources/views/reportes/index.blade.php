@@ -50,8 +50,20 @@
                     @foreach($grupos as $g)<option value="{{ $g }}" @selected(request('grupo') === $g)>{{ $g }}</option>@endforeach
                 </select>
             </div>
-            <div class="field"><label>Color</label><input name="color" value="{{ request('color') }}" placeholder="Ej.: NEGRO"></div>
-            <div class="field"><label>Talle</label><input name="talle" value="{{ request('talle') }}" placeholder="Ej.: M"></div>
+            <div class="field">
+                <label>Color</label>
+                <select name="color">
+                    <option value="">Todos los colores</option>
+                    @foreach($colores as $c)<option value="{{ $c }}" @selected(request('color') === $c)>{{ $c }}</option>@endforeach
+                </select>
+            </div>
+            <div class="field">
+                <label>Talle</label>
+                <select name="talle">
+                    <option value="">Todos los talles</option>
+                    @foreach($talles as $t)<option value="{{ $t }}" @selected(request('talle') === $t)>{{ $t }}</option>@endforeach
+                </select>
+            </div>
             <div class="field">
                 <label>Estado</label>
                 <select name="estado">
@@ -90,9 +102,9 @@
                         <td><span class="cell-title">#{{ $p->id }}</span><span class="cell-meta">{{ $p->created_at->format('d/m/Y H:i:s') }}</span></td>
                         <td><span class="cell-title">{{ $p->sucursal->nombre }}</span></td>
                         <td>{{ $p->usuario->name }}</td>
-                        <td>{{ $p->item->grupo }}</td>
-                        <td>{{ $p->item->color }}</td>
-                        <td><strong>{{ $p->item->talle }}</strong></td>
+                        <td>{{ $p->grupo?->nombre ?? $p->item?->grupo ?? '—' }}</td>
+                        <td>{{ $p->color?->nombre ?? $p->item?->color ?? '—' }}</td>
+                        <td><strong>{{ $p->talle?->nombre ?? $p->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $p->observacion ?: 'Sin observación' }}</td>
                         <td><span class="badge badge-{{ strtolower($p->estado) }}">{{ $p->estado }}</span></td>
                     </tr>

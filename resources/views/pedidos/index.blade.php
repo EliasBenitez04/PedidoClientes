@@ -35,9 +35,9 @@
                         <td><span class="cell-title">#{{ $p->id }}</span><span class="cell-meta">{{ $p->created_at->format('d/m/Y H:i') }}</span></td>
                         <td><span class="cell-title">{{ $p->sucursal->nombre }}</span></td>
                         <td>{{ $p->usuario->name }}</td>
-                        <td><span class="cell-title">{{ $p->item->grupo }}</span></td>
-                        <td>{{ $p->item->color }}</td>
-                        <td><strong>{{ $p->item->talle }}</strong></td>
+                        <td><span class="cell-title">{{ $p->grupo?->nombre ?? $p->item?->grupo ?? '—' }}</span></td>
+                        <td>{{ $p->color?->nombre ?? $p->item?->color ?? '—' }}</td>
+                        <td><strong>{{ $p->talle?->nombre ?? $p->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $p->observacion ?: 'Sin observación' }}</td>
                         <td>
                             <span class="badge badge-{{ strtolower($p->estado) }}">{{ $p->estado }}</span>

@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CatalogoItem;
+use App\Models\CatalogoColor;
+use App\Models\CatalogoGrupo;
+use App\Models\CatalogoTalle;
 use App\Models\Pedido;
 use App\Models\Sucursal;
 use App\Models\User;
@@ -23,9 +25,18 @@ class ReporteController extends Controller
             ? User::where('activo', true)->orderBy('name')->get()
             : collect();
 
-        $grupos = CatalogoItem::select('grupo')->distinct()->orderBy('grupo')->pluck('grupo');
+        $grupos = CatalogoGrupo::where('activo', true)->orderBy('nombre')->pluck('nombre');
+        $colores = CatalogoColor::where('activo', true)->orderBy('nombre')->pluck('nombre');
+        $talles = CatalogoTalle::where('activo', true)->orderBy('nombre')->pluck('nombre');
 
-        return view('reportes.index', compact('pedidos', 'sucursales', 'usuarios', 'grupos'));
+        return view('reportes.index', compact(
+            'pedidos',
+            'sucursales',
+            'usuarios',
+            'grupos',
+            'colores',
+            'talles'
+        ));
     }
 
     public function exportar(Request $request)
@@ -44,9 +55,9 @@ class ReporteController extends Controller
                     $pedido->created_at->format('d/m/Y H:i:s'),
                     $pedido->sucursal->nombre,
                     $pedido->usuario->name,
-                    $pedido->item->grupo,
-                    $pedido->item->color,
-                    $pedido->item->talle,
+                    $pedido->grupo?->nombre ?? $pedido->item?->grupo ?? '',
+                    $pedido->color?->nombre ?? $pedido->item?->color ?? '',
+                    $pedido->talle?->nombre ?? $pedido->item?->talle ?? '',
                     $pedido->observacion,
                     $pedido->estado,
                 ], ';');
@@ -60,7 +71,7 @@ class ReporteController extends Controller
     {
         $user = auth()->user();
 
-        $query = Pedido::with(['usuario', 'sucursal', 'item'])->latest();
+        $query = Pedido::with(['usuario', 'sucursal', 'grupo', 'color', 'talle', 'item'])->latest();
 
         if (!$user->puedeVerTodo()) {
             $query->where('sucursal_id', $user->sucursal_id);
@@ -84,12 +95,16 @@ class ReporteController extends Controller
             $query->where('estado', $request->estado);
         }
 
-        if ($request->filled('grupo') || $request->filled('color') || $request->filled('talle')) {
-            $query->whereHas('item', function ($q) use ($request) {
-                if ($request->filled('grupo')) $q->where('grupo', $request->grupo);
-                if ($request->filled('color')) $q->where('color', $request->color);
-                if ($request->filled('talle')) $q->where('talle', $request->talle);
-            });
+        if ($request->filled('grupo')) {
+            $query->whereHas('grupo', fn ($q) => $q->where('nombre', $request->grupo));
+        }
+
+        if ($request->filled('color')) {
+            $query->whereHas('color', fn ($q) => $q->where('nombre', $request->color));
+        }
+
+        if ($request->filled('talle')) {
+            $query->whereHas('talle', fn ($q) => $q->where('nombre', $request->talle));
         }
 
         return $query;

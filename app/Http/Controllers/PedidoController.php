@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CatalogoItem;
+use App\Models\CatalogoColor;
+use App\Models\CatalogoGrupo;
+use App\Models\CatalogoTalle;
 use App\Models\Pedido;
 use Illuminate\Http\Request;
 
@@ -12,7 +14,7 @@ class PedidoController extends Controller
     {
         $user = auth()->user();
 
-        $query = Pedido::with(['usuario', 'sucursal', 'item'])->latest();
+        $query = Pedido::with(['usuario', 'sucursal', 'grupo', 'color', 'talle', 'item'])->latest();
 
         if (!$user->puedeVerTodo()) {
             $query->where('sucursal_id', $user->sucursal_id);
@@ -25,44 +27,19 @@ class PedidoController extends Controller
 
     public function create()
     {
-        $grupos = CatalogoItem::where('activo', true)
-            ->select('grupo')->distinct()->orderBy('grupo')->pluck('grupo');
+        $grupos = CatalogoGrupo::where('activo', true)->orderBy('nombre')->get();
+        $colores = CatalogoColor::where('activo', true)->orderBy('nombre')->get();
+        $talles = CatalogoTalle::where('activo', true)->orderBy('nombre')->get();
 
-        return view('pedidos.create', compact('grupos'));
-    }
-
-    public function colores(Request $request)
-    {
-        $request->validate(['grupo' => ['required', 'string', 'max:120']]);
-
-        return response()->json(
-            CatalogoItem::where('activo', true)
-                ->where('grupo', $request->grupo)
-                ->select('color')->distinct()->orderBy('color')->pluck('color')
-        );
-    }
-
-    public function talles(Request $request)
-    {
-        $request->validate([
-            'grupo' => ['required', 'string', 'max:120'],
-            'color' => ['required', 'string', 'max:120'],
-        ]);
-
-        return response()->json(
-            CatalogoItem::where('activo', true)
-                ->where('grupo', $request->grupo)
-                ->where('color', $request->color)
-                ->select('talle')->distinct()->orderBy('talle')->pluck('talle')
-        );
+        return view('pedidos.create', compact('grupos', 'colores', 'talles'));
     }
 
     public function store(Request $request)
     {
         $data = $request->validate([
-            'grupo' => ['required', 'string', 'max:120'],
-            'color' => ['required', 'string', 'max:120'],
-            'talle' => ['required', 'string', 'max:50'],
+            'grupo_id' => ['required', 'integer', 'exists:catalogo_grupos,id'],
+            'color_id' => ['required', 'integer', 'exists:catalogo_colores,id'],
+            'talle_id' => ['required', 'integer', 'exists:catalogo_talles,id'],
             'observacion' => ['nullable', 'string', 'max:2000'],
         ]);
 
@@ -74,22 +51,23 @@ class PedidoController extends Controller
             ]);
         }
 
-        $item = CatalogoItem::where('activo', true)
-            ->where('grupo', $data['grupo'])
-            ->where('color', $data['color'])
-            ->where('talle', $data['talle'])
-            ->first();
+        $grupo = CatalogoGrupo::whereKey($data['grupo_id'])->where('activo', true)->first();
+        $color = CatalogoColor::whereKey($data['color_id'])->where('activo', true)->first();
+        $talle = CatalogoTalle::whereKey($data['talle_id'])->where('activo', true)->first();
 
-        if (!$item) {
+        if (!$grupo || !$color || !$talle) {
             return back()->withInput()->withErrors([
-                'talle' => 'La combinación grupo/color/talle ya no está disponible.',
+                'catalogo' => 'Uno de los valores seleccionados ya no está activo. Actualizá la pantalla y volvé a intentar.',
             ]);
         }
 
         $pedido = Pedido::create([
             'user_id' => $user->id,
             'sucursal_id' => $user->sucursal_id,
-            'catalogo_item_id' => $item->id,
+            'grupo_id' => $grupo->id,
+            'color_id' => $color->id,
+            'talle_id' => $talle->id,
+            'catalogo_item_id' => null,
             'observacion' => $data['observacion'] ?? null,
             'estado' => 'PENDIENTE',
         ]);

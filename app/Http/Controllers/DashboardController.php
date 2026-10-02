@@ -27,7 +27,7 @@ class DashboardController extends Controller
         ];
 
         $ultimos = (clone $base)
-            ->with(['usuario', 'sucursal', 'item'])
+            ->with(['usuario', 'sucursal', 'grupo', 'color', 'talle', 'item'])
             ->latest()
             ->limit(10)
             ->get();

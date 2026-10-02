@@ -24,9 +24,6 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/pedidos/nuevo', [PedidoController::class, 'create'])->name('pedidos.create');
     Route::post('/pedidos', [PedidoController::class, 'store'])->name('pedidos.store');
 
-    Route::get('/catalogo/colores', [PedidoController::class, 'colores'])->name('catalogo.colores');
-    Route::get('/catalogo/talles', [PedidoController::class, 'talles'])->name('catalogo.talles');
-
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('reportes.exportar');
 

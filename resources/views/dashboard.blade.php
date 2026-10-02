@@ -60,9 +60,9 @@
                         <td><span class="cell-title">{{ $p->created_at->format('d/m/Y') }}</span><span class="cell-meta">{{ $p->created_at->format('H:i') }}</span></td>
                         <td>{{ $p->sucursal->nombre }}</td>
                         <td>{{ $p->usuario->name }}</td>
-                        <td><span class="cell-title">{{ $p->item->grupo }}</span></td>
-                        <td>{{ $p->item->color }}</td>
-                        <td><strong>{{ $p->item->talle }}</strong></td>
+                        <td><span class="cell-title">{{ $p->grupo?->nombre ?? $p->item?->grupo ?? '—' }}</span></td>
+                        <td>{{ $p->color?->nombre ?? $p->item?->color ?? '—' }}</td>
+                        <td><strong>{{ $p->talle?->nombre ?? $p->item?->talle ?? '—' }}</strong></td>
                         <td><span class="badge badge-{{ strtolower($p->estado) }}">{{ $p->estado }}</span></td>
                     </tr>
                 @endforeach
