@@ -1,3 +1,42 @@
+@php
+    $resolveBrandAsset = function (array $candidates) {
+        foreach ($candidates as $candidate) {
+            $relative = 'images/'.$candidate;
+            $absolute = public_path($relative);
+
+            if (file_exists($absolute)) {
+                return asset($relative).'?v='.filemtime($absolute);
+            }
+        }
+
+        return asset('images/'.$candidates[0]);
+    };
+
+    $logoGotitasClaro = $resolveBrandAsset([
+        'logo-gotitas.png',
+        'logo-gotitas.jpg',
+        'logo-gotitas.jpeg',
+        'logo-gotitas.webp',
+        'gotitas.png',
+        'logo.png',
+    ]);
+
+    $logoGotitasOscuro = $resolveBrandAsset([
+        'logo-gotitas-blanco.png',
+        'logo-gotitas-blanco.jpg',
+        'logo-gotitas-blanco.jpeg',
+        'logo-gotitas-blanco.webp',
+        'logo-gotitas-white.png',
+        'logo-gotitas.png',
+        'gotitas.png',
+    ]);
+
+    $faviconGotitas = $resolveBrandAsset([
+        'favicon-gotitas.png',
+        'favicon.png',
+        'logo-gotitas.png',
+    ]);
+@endphp
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -6,7 +45,7 @@
     <meta name="theme-color" content="#111827">
     <title>@yield('title', 'GOTITAS') - GOTITAS</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/favicon-gotitas.png') }}">
+    <link rel="icon" type="image/png" href="{{ $faviconGotitas }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
@@ -18,7 +57,7 @@
         <div class="brand">
             <div class="brand-logo-slot sidebar-logo-slot">
                 <img
-                    src="{{ asset('images/logo-gotitas-blanco.png') }}"
+                    src="{{ $logoGotitasOscuro }}"
                     alt="GOTITAS"
                     class="brand-logo brand-logo-sidebar"
                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';"

@@ -1,3 +1,37 @@
+@php
+    $resolveLoginBrandAsset = function (array $candidates) {
+        foreach ($candidates as $candidate) {
+            $relative = 'images/'.$candidate;
+            $absolute = public_path($relative);
+
+            if (file_exists($absolute)) {
+                return asset($relative).'?v='.filemtime($absolute);
+            }
+        }
+
+        return asset('images/'.$candidates[0]);
+    };
+
+    $loginLogoClaro = $resolveLoginBrandAsset([
+        'logo-gotitas.png',
+        'logo-gotitas.jpg',
+        'logo-gotitas.jpeg',
+        'logo-gotitas.webp',
+        'gotitas.png',
+        'logo.png',
+    ]);
+
+    $loginLogoOscuro = $resolveLoginBrandAsset([
+        'logo-gotitas-blanco.png',
+        'logo-gotitas-blanco.jpg',
+        'logo-gotitas-blanco.jpeg',
+        'logo-gotitas-blanco.webp',
+        'logo-gotitas-white.png',
+        'logo-gotitas.png',
+        'gotitas.png',
+    ]);
+@endphp
+
 @extends('layouts.app')
 
 @section('title', 'Iniciar sesión')
@@ -7,7 +41,7 @@
     <section class="login-visual">
         <div class="login-brand-logo">
             <img
-                src="{{ asset('images/logo-gotitas-blanco.png') }}"
+                src="{{ $loginLogoOscuro }}"
                 alt="GOTITAS"
                 onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
             >
@@ -22,7 +56,7 @@
         <div class="login-card">
             <div class="login-logo-light">
                 <img
-                    src="{{ asset('images/logo-gotitas.png') }}"
+                    src="{{ $loginLogoClaro }}"
                     alt="GOTITAS"
                     onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
                 >
