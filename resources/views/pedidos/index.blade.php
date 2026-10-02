@@ -44,7 +44,7 @@
                             @if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']))
                                 <form action="{{ route('pedidos.estado', $p) }}" method="POST" style="margin-top:7px">
                                     @csrf @method('PATCH')
-                                    <select name="estado" onchange="this.form.submit()" class="state-select">
+                                    <select name="estado" class="state-select js-state-select" data-current="{{ $p->estado }}">
                                         @foreach(['PENDIENTE','PROCESADO','CANCELADO'] as $estado)
                                             <option value="{{ $estado }}" @selected($p->estado === $estado)>{{ $estado }}</option>
                                         @endforeach

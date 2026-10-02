@@ -15,10 +15,6 @@
             <h1>Bienvenido</h1>
             <p class="intro">Ingresá con tu usuario para acceder al sistema.</p>
 
-            @if($errors->any())
-                <div class="alert alert-danger">{{ $errors->first() }}</div>
-            @endif
-
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
                 <div class="field">

@@ -17,7 +17,7 @@
     <div class="card-header">
         <div>
             <h2>Filtros del reporte</h2>
-            <div class="card-subtitle">Combiná uno o varios criterios.</div>
+            <div class="card-subtitle">Los selectores permiten buscar escribiendo.</div>
         </div>
     </div>
 
@@ -29,15 +29,15 @@
             @if(auth()->user()->puedeVerTodo())
                 <div class="field">
                     <label>Sucursal</label>
-                    <select name="sucursal_id">
-                        <option value="">Todas las sucursales</option>
+                    <select name="sucursal_id" class="select2" data-placeholder="Todas las sucursales">
+                        <option value=""></option>
                         @foreach($sucursales as $s)<option value="{{ $s->id }}" @selected((string)request('sucursal_id') === (string)$s->id)>{{ $s->nombre }}</option>@endforeach
                     </select>
                 </div>
                 <div class="field">
                     <label>Usuario</label>
-                    <select name="usuario_id">
-                        <option value="">Todos los usuarios</option>
+                    <select name="usuario_id" class="select2" data-placeholder="Todos los usuarios">
+                        <option value=""></option>
                         @foreach($usuarios as $u)<option value="{{ $u->id }}" @selected((string)request('usuario_id') === (string)$u->id)>{{ $u->name }}</option>@endforeach
                     </select>
                 </div>
@@ -45,29 +45,29 @@
 
             <div class="field">
                 <label>Grupo</label>
-                <select name="grupo">
-                    <option value="">Todos los grupos</option>
+                <select name="grupo" class="select2" data-placeholder="Todos los grupos">
+                    <option value=""></option>
                     @foreach($grupos as $g)<option value="{{ $g }}" @selected(request('grupo') === $g)>{{ $g }}</option>@endforeach
                 </select>
             </div>
             <div class="field">
                 <label>Color</label>
-                <select name="color">
-                    <option value="">Todos los colores</option>
+                <select name="color" class="select2" data-placeholder="Todos los colores">
+                    <option value=""></option>
                     @foreach($colores as $c)<option value="{{ $c }}" @selected(request('color') === $c)>{{ $c }}</option>@endforeach
                 </select>
             </div>
             <div class="field">
                 <label>Talle</label>
-                <select name="talle">
-                    <option value="">Todos los talles</option>
+                <select name="talle" class="select2" data-placeholder="Todos los talles">
+                    <option value=""></option>
                     @foreach($talles as $t)<option value="{{ $t }}" @selected(request('talle') === $t)>{{ $t }}</option>@endforeach
                 </select>
             </div>
             <div class="field">
                 <label>Estado</label>
-                <select name="estado">
-                    <option value="">Todos los estados</option>
+                <select name="estado" class="select2-no-search" data-placeholder="Todos los estados">
+                    <option value=""></option>
                     @foreach(['PENDIENTE','PROCESADO','CANCELADO'] as $e)<option value="{{ $e }}" @selected(request('estado') === $e)>{{ $e }}</option>@endforeach
                 </select>
             </div>

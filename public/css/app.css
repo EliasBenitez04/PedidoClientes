@@ -522,3 +522,109 @@ tbody tr:hover td{background:#fafbfc}
     .login-panel{min-height:100vh;padding:20px}
     .login-card{padding:24px}
 }
+
+
+/* Select2 integrado al diseño del sistema */
+.select2-container{width:100%!important}
+.select2-container .select2-selection--single{
+    height:42px;
+    min-height:42px;
+    display:flex;
+    align-items:center;
+    border:1px solid var(--border-strong);
+    border-radius:10px;
+    background:#fff;
+    transition:border-color .15s ease,box-shadow .15s ease;
+}
+.select2-container .select2-selection--single:hover{border-color:#98a2b3}
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single{
+    border-color:#818cf8;
+    box-shadow:0 0 0 4px rgba(99,102,241,.10);
+}
+.select2-container--default .select2-selection--single .select2-selection__rendered{
+    width:100%;
+    padding:0 38px 0 12px;
+    color:#101828;
+    line-height:40px;
+    font-size:13px;
+}
+.select2-container--default .select2-selection--single .select2-selection__placeholder{color:#98a2b3}
+.select2-container--default .select2-selection--single .select2-selection__arrow{
+    height:40px;
+    right:8px;
+}
+.select2-container--default .select2-selection--single .select2-selection__clear{
+    position:absolute;
+    right:28px;
+    top:8px;
+    z-index:2;
+    color:#98a2b3;
+    font-size:17px;
+}
+.select2-dropdown{
+    overflow:hidden;
+    border:1px solid #d0d5dd;
+    border-radius:11px;
+    background:#fff;
+    box-shadow:0 14px 34px rgba(16,24,40,.12);
+}
+.select2-container--open .select2-dropdown--below{margin-top:5px}
+.select2-search--dropdown{padding:9px}
+.select2-container--default .select2-search--dropdown .select2-search__field{
+    min-height:38px;
+    padding:8px 10px;
+    border:1px solid #d0d5dd;
+    border-radius:8px;
+    outline:none;
+}
+.select2-container--default .select2-search--dropdown .select2-search__field:focus{
+    border-color:#818cf8;
+    box-shadow:0 0 0 3px rgba(99,102,241,.10);
+}
+.select2-results__options{padding:5px}
+.select2-container--default .select2-results__option{
+    margin:2px 0;
+    padding:8px 10px;
+    border-radius:7px;
+    color:#344054;
+    font-size:12px;
+}
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable{
+    background:#eef2ff;
+    color:#3730a3;
+}
+.select2-container--default .select2-results__option--selected{
+    background:#f5f7ff;
+    color:#4338ca;
+    font-weight:750;
+}
+.select2-container--default.select2-container--disabled .select2-selection--single{
+    background:#f2f4f7;
+    color:#98a2b3;
+}
+.field .select2-container{display:block}
+.table-scroll .select2-container{min-width:145px}
+
+/* SweetAlert alineado con la interfaz */
+.swal2-popup{
+    border-radius:18px!important;
+    font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif!important;
+}
+.swal2-title{
+    color:#101828!important;
+    font-size:22px!important;
+    letter-spacing:-.025em!important;
+}
+.swal2-html-container{color:#667085!important;font-size:13px!important}
+.swal2-confirm,.swal2-cancel{
+    border-radius:9px!important;
+    padding:9px 15px!important;
+    font-size:12px!important;
+    font-weight:800!important;
+}
+.swal2-timer-progress-bar{background:#4f46e5!important}
+
+@media(max-width:760px){
+    .select2-container{max-width:100%}
+}

@@ -17,7 +17,7 @@
     <div class="card form-card card-elevated">
         <div class="form-card-header">
             <h2>Datos de la solicitud</h2>
-            <p>Los tres catálogos son independientes. Elegí un valor de cada lista.</p>
+            <p>Los tres catálogos son independientes. Podés buscar escribiendo dentro de cada selector.</p>
         </div>
 
         <form method="POST" action="{{ route('pedidos.store') }}" id="pedidoForm" class="form-card-body">
@@ -32,8 +32,8 @@
                 <div class="grid grid-3">
                     <div class="field">
                         <label for="grupo_id">Grupo</label>
-                        <select name="grupo_id" id="grupo_id" required>
-                            <option value="">Seleccionar grupo...</option>
+                        <select name="grupo_id" id="grupo_id" class="select2" data-placeholder="Buscar grupo..." required>
+                            <option value=""></option>
                             @foreach($grupos as $grupo)
                                 <option value="{{ $grupo->id }}" @selected((string) old('grupo_id') === (string) $grupo->id)>{{ $grupo->nombre }}</option>
                             @endforeach
@@ -43,8 +43,8 @@
 
                     <div class="field">
                         <label for="color_id">Color</label>
-                        <select name="color_id" id="color_id" required>
-                            <option value="">Seleccionar color...</option>
+                        <select name="color_id" id="color_id" class="select2" data-placeholder="Buscar color..." required>
+                            <option value=""></option>
                             @foreach($colores as $color)
                                 <option value="{{ $color->id }}" @selected((string) old('color_id') === (string) $color->id)>{{ $color->nombre }}</option>
                             @endforeach
@@ -54,8 +54,8 @@
 
                     <div class="field">
                         <label for="talle_id">Talle</label>
-                        <select name="talle_id" id="talle_id" required>
-                            <option value="">Seleccionar talle...</option>
+                        <select name="talle_id" id="talle_id" class="select2" data-placeholder="Buscar talle..." required>
+                            <option value=""></option>
                             @foreach($talles as $talle)
                                 <option value="{{ $talle->id }}" @selected((string) old('talle_id') === (string) $talle->id)>{{ $talle->nombre }}</option>
                             @endforeach
@@ -101,7 +101,7 @@
 
             <div class="info-row">
                 <div class="info-dot">1</div>
-                <div><strong>Catálogos separados</strong><span>Grupo, color y talle se mantienen de forma independiente.</span></div>
+                <div><strong>Búsqueda rápida</strong><span>Los selectores permiten escribir para encontrar grupo, color o talle.</span></div>
             </div>
             <div class="info-row">
                 <div class="info-dot">2</div>
