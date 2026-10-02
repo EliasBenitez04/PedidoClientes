@@ -17,11 +17,14 @@ class SolicitudCliente extends Model
         'catalogo_item_id',
         'observacion',
         'estado',
+        'revisado_por_id',
+        'revisado_en',
     ];
 
     protected $casts = [
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
+        'revisado_en' => 'datetime',
     ];
 
     public function usuario()
@@ -52,5 +55,10 @@ class SolicitudCliente extends Model
     public function item()
     {
         return $this->belongsTo(CatalogoItem::class, 'catalogo_item_id');
+    }
+
+    public function revisor()
+    {
+        return $this->belongsTo(User::class, 'revisado_por_id');
     }
 }

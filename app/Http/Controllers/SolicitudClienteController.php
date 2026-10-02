@@ -14,7 +14,15 @@ class SolicitudClienteController extends Controller
     {
         $user = auth()->user();
 
-        $query = SolicitudCliente::with(['usuario', 'sucursal', 'grupo', 'color', 'talle', 'item'])
+        $query = SolicitudCliente::with([
+                'usuario',
+                'sucursal',
+                'grupo',
+                'color',
+                'talle',
+                'item',
+                'revisor',
+            ])
             ->latest();
 
         if (!$user->puedeVerTodo()) {
@@ -78,13 +86,62 @@ class SolicitudClienteController extends Controller
             ->with('success', 'Demanda registrada #'.$solicitud->id.'.');
     }
 
+    public function revisar(SolicitudCliente $solicitud)
+    {
+        if ($solicitud->estado === 'REVISADO') {
+            return back()->with('success', 'El registro ya estaba revisado.');
+        }
+
+        $solicitud->update([
+            'estado' => 'REVISADO',
+            'revisado_por_id' => auth()->id(),
+            'revisado_en' => now(),
+        ]);
+
+        return back()->with('success', 'Registro #'.$solicitud->id.' marcado como revisado.');
+    }
+
+    public function revisarMasivo(Request $request)
+    {
+        $data = $request->validate([
+            'ids' => ['required', 'array', 'min:1'],
+            'ids.*' => ['integer', 'distinct', 'exists:solicitudes_clientes,id'],
+        ]);
+
+        $cantidad = SolicitudCliente::whereIn('id', $data['ids'])
+            ->where('estado', 'REGISTRADO')
+            ->update([
+                'estado' => 'REVISADO',
+                'revisado_por_id' => auth()->id(),
+                'revisado_en' => now(),
+                'updated_at' => now(),
+            ]);
+
+        return back()->with(
+            'success',
+            $cantidad === 1
+                ? '1 registro marcado como revisado.'
+                : $cantidad.' registros marcados como revisados.'
+        );
+    }
+
     public function updateEstado(Request $request, SolicitudCliente $solicitud)
     {
         $data = $request->validate([
             'estado' => ['required', 'in:REGISTRADO,REVISADO,DESCARTADO'],
         ]);
 
-        $solicitud->update(['estado' => $data['estado']]);
+        $payload = ['estado' => $data['estado']];
+
+        if ($data['estado'] === 'REVISADO') {
+            $payload['revisado_por_id'] = auth()->id();
+            $payload['revisado_en'] = now();
+        } elseif ($data['estado'] === 'REGISTRADO') {
+            $payload['revisado_por_id'] = null;
+            $payload['revisado_en'] = null;
+        }
+
+        $solicitud->update($payload);
 
         return back()->with('success', 'Estado actualizado.');
     }

@@ -5,15 +5,32 @@
 @section('content')
 <div class="login-page">
     <section class="login-visual">
-        <div class="brand-mark">DC</div>
+        <div class="login-brand-logo">
+            <img
+                src="{{ asset('images/logo-gotitas-blanco.png') }}"
+                alt="GOTITAS"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+            >
+            <span class="login-logo-fallback">GOTITAS</span>
+        </div>
+
         <h2>Escuchá lo que<br>el cliente está pidiendo.</h2>
         <p>Registrá productos que los clientes buscan y no encuentran en el local para convertir faltantes en información comercial.</p>
     </section>
 
     <section class="login-panel">
         <div class="login-card">
-            <h1>Demanda Clientes</h1>
-            <p class="intro">Ingresá con el usuario asignado a tu tienda.</p>
+            <div class="login-logo-light">
+                <img
+                    src="{{ asset('images/logo-gotitas.png') }}"
+                    alt="GOTITAS"
+                    onerror="this.style.display='none';this.nextElementSibling.style.display='block';"
+                >
+                <span class="login-logo-light-fallback">GOTITAS</span>
+            </div>
+
+            <h1>GOTITAS</h1>
+            <p class="intro">Demanda no cubierta · Ingresá con el usuario asignado a tu tienda.</p>
 
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
@@ -56,7 +73,7 @@
                 </button>
             </form>
 
-            <div class="login-footer">Demanda Clientes · Registro de oportunidades no cubiertas</div>
+            <div class="login-footer">GOTITAS · Registro de oportunidades no cubiertas</div>
         </div>
     </section>
 </div>

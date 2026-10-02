@@ -27,14 +27,19 @@ Route::middleware(['auth', 'active'])->group(function () {
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('reportes.exportar');
 
-    // Compatibilidad con accesos guardados de la versión anterior.
     Route::redirect('/pedidos', '/solicitudes');
     Route::redirect('/pedidos/nuevo', '/solicitudes/nueva');
 
     Route::middleware('role:ADMIN,SUPERVISOR')->group(function () {
-        // Importadores: se mantienen sin cambios.
+        // Importadores: mantener sin cambios.
         Route::get('/catalogo/importar', [CatalogoImportController::class, 'index'])->name('catalogo.importar');
         Route::post('/catalogo/importar', [CatalogoImportController::class, 'importar'])->name('catalogo.importar.post');
+
+        Route::patch('/solicitudes/revisar-masivo', [SolicitudClienteController::class, 'revisarMasivo'])
+            ->name('solicitudes.revisar-masivo');
+
+        Route::patch('/solicitudes/{solicitud}/revisar', [SolicitudClienteController::class, 'revisar'])
+            ->name('solicitudes.revisar');
 
         Route::patch('/solicitudes/{solicitud}/estado', [SolicitudClienteController::class, 'updateEstado'])
             ->name('solicitudes.estado');

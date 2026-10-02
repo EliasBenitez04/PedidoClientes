@@ -634,3 +634,161 @@ tbody tr:hover td{background:#fafbfc}
 .badge-registrado{background:var(--info-soft);color:var(--info)}
 .badge-revisado{background:var(--success-soft);color:var(--success)}
 .badge-descartado{background:var(--danger-soft);color:var(--danger)}
+
+
+/* Branding GOTITAS */
+.brand-logo-slot{
+    width:54px;
+    min-width:54px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+.brand-logo{
+    display:block;
+    max-width:54px;
+    max-height:38px;
+    object-fit:contain;
+}
+.brand-logo-fallback{
+    display:none;
+    color:#fff;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.05em;
+}
+.login-brand-logo{
+    position:absolute;
+    left:56px;
+    top:48px;
+    z-index:2;
+}
+.login-brand-logo img{
+    display:block;
+    max-width:210px;
+    max-height:76px;
+    object-fit:contain;
+}
+.login-logo-fallback{
+    display:none;
+    color:#fff;
+    font-size:27px;
+    font-weight:900;
+    letter-spacing:.08em;
+}
+.login-logo-light{
+    min-height:54px;
+    margin-bottom:14px;
+    display:flex;
+    align-items:center;
+}
+.login-logo-light img{
+    display:block;
+    max-width:190px;
+    max-height:54px;
+    object-fit:contain;
+}
+.login-logo-light-fallback{
+    display:none;
+    color:#111827;
+    font-size:24px;
+    font-weight:900;
+    letter-spacing:.08em;
+}
+
+/* Revisión práctica */
+.review-toolbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:14px;
+    padding:14px 16px;
+    border:1px solid #abefc6;
+    border-radius:13px;
+    background:linear-gradient(180deg,#f6fef9,#ecfdf3);
+}
+.review-toolbar strong{
+    display:block;
+    color:#05603a;
+    font-size:13px;
+}
+.review-toolbar span{
+    display:block;
+    margin-top:2px;
+    color:#667085;
+    font-size:11px;
+}
+.review-toolbar-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    flex-wrap:wrap;
+}
+.review-selected-count{
+    min-width:90px;
+    text-align:right;
+    color:#067647!important;
+    font-weight:800;
+}
+.table-checkbox{
+    width:16px;
+    min-height:auto;
+    height:16px;
+    accent-color:#4f46e5;
+    cursor:pointer;
+}
+.checkbox-cell{
+    width:42px;
+    min-width:42px;
+    text-align:center;
+}
+.review-cell{min-width:210px}
+.review-actions{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-top:8px;
+}
+.review-audit{
+    margin-top:7px;
+    padding:7px 8px;
+    border-radius:8px;
+    background:#f8fafc;
+    border:1px solid #eaecf0;
+}
+.review-audit strong{
+    display:block;
+    color:#344054;
+    font-size:10px;
+}
+.review-audit span{
+    display:block;
+    margin-top:1px;
+    color:#98a2b3;
+    font-size:9px;
+}
+.row-reviewed td{
+    background:linear-gradient(90deg,rgba(236,253,243,.45),rgba(255,255,255,0));
+}
+.btn:disabled{
+    opacity:.5;
+    cursor:not-allowed;
+    transform:none!important;
+}
+
+@media(max-width:760px){
+    .review-toolbar{
+        align-items:flex-start;
+        flex-direction:column;
+    }
+    .review-toolbar-actions{
+        width:100%;
+    }
+    .review-toolbar-actions .btn{
+        width:100%;
+    }
+    .login-brand-logo{display:none}
+}

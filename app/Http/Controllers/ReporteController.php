@@ -42,7 +42,7 @@ class ReporteController extends Controller
     public function exportar(Request $request)
     {
         $solicitudes = $this->consulta($request)->get();
-        $filename = 'demanda_no_cubierta_'.now()->format('Ymd_His').'.csv';
+        $filename = 'gotitas_demanda_no_cubierta_'.now()->format('Ymd_His').'.csv';
 
         return response()->streamDownload(function () use ($solicitudes) {
             $out = fopen('php://output', 'w');
@@ -58,6 +58,8 @@ class ReporteController extends Controller
                 'Talle',
                 'Observación',
                 'Estado',
+                'Revisado por',
+                'Revisado en',
             ], ';');
 
             foreach ($solicitudes as $solicitud) {
@@ -71,6 +73,8 @@ class ReporteController extends Controller
                     $solicitud->talle?->nombre ?? $solicitud->item?->talle ?? '',
                     $solicitud->observacion,
                     $solicitud->estado,
+                    $solicitud->revisor?->name ?? '',
+                    $solicitud->revisado_en?->format('d/m/Y H:i:s') ?? '',
                 ], ';');
             }
 
@@ -89,6 +93,7 @@ class ReporteController extends Controller
             'color',
             'talle',
             'item',
+            'revisor',
         ])->latest();
 
         if (!$user->puedeVerTodo()) {

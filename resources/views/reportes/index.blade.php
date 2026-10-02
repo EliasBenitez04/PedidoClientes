@@ -134,7 +134,7 @@
                         <th>Color</th>
                         <th>Talle</th>
                         <th>Observación</th>
-                        <th>Estado</th>
+                        <th>Estado / Revisión</th>
                     </tr>
                 </thead>
 
@@ -152,7 +152,16 @@
                         <td>{{ $s->color?->nombre ?? $s->item?->color ?? '—' }}</td>
                         <td><strong>{{ $s->talle?->nombre ?? $s->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $s->observacion ?: 'Sin observación' }}</td>
-                        <td><span class="badge badge-{{ strtolower($s->estado) }}">{{ $s->estado }}</span></td>
+                        <td>
+                            <span class="badge badge-{{ strtolower($s->estado) }}">{{ $s->estado }}</span>
+
+                            @if($s->estado === 'REVISADO')
+                                <div class="review-audit">
+                                    <strong>{{ $s->revisor?->name ?? 'Usuario no disponible' }}</strong>
+                                    <span>{{ $s->revisado_en?->format('d/m/Y H:i') ?? 'Sin fecha registrada' }}</span>
+                                </div>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>

@@ -14,6 +14,33 @@
     </div>
 </div>
 
+@if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']) && !$solicitudes->isEmpty())
+    <div class="review-toolbar">
+        <div>
+            <strong>Revisión rápida</strong>
+            <span>Seleccioná varios registros y revisalos en una sola acción.</span>
+        </div>
+
+        <div class="review-toolbar-actions">
+            <span id="bulkSelectedCount" class="review-selected-count"></span>
+
+            <form
+                id="bulkReviewForm"
+                action="{{ route('solicitudes.revisar-masivo') }}"
+                method="POST"
+                class="js-bulk-review-form"
+            >
+                @csrf
+                @method('PATCH')
+
+                <button id="bulkReviewButton" class="btn btn-success" type="submit" disabled>
+                    ✓ Marcar seleccionados como revisados
+                </button>
+            </form>
+        </div>
+    </div>
+@endif
+
 <div class="card table-card">
     <div class="table-toolbar">
         <div>
@@ -31,6 +58,12 @@
             <table>
                 <thead>
                     <tr>
+                        @if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']))
+                            <th class="checkbox-cell">
+                                <input type="checkbox" id="selectAllRows" class="table-checkbox" title="Seleccionar todos los registrados">
+                            </th>
+                        @endif
+
                         <th>ID / Fecha</th>
                         <th>Local</th>
                         <th>Registrado por</th>
@@ -38,13 +71,28 @@
                         <th>Color</th>
                         <th>Talle</th>
                         <th>Observación</th>
-                        <th>Estado</th>
+                        <th>Estado / Revisión</th>
                     </tr>
                 </thead>
 
                 <tbody>
                 @foreach($solicitudes as $s)
-                    <tr>
+                    <tr class="{{ $s->estado === 'REVISADO' ? 'row-reviewed' : '' }}">
+                        @if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']))
+                            <td class="checkbox-cell">
+                                @if($s->estado === 'REGISTRADO')
+                                    <input
+                                        type="checkbox"
+                                        name="ids[]"
+                                        value="{{ $s->id }}"
+                                        class="table-checkbox js-row-check"
+                                        form="bulkReviewForm"
+                                        aria-label="Seleccionar registro {{ $s->id }}"
+                                    >
+                                @endif
+                            </td>
+                        @endif
+
                         <td>
                             <span class="cell-title">#{{ $s->id }}</span>
                             <span class="cell-meta">{{ $s->created_at->format('d/m/Y H:i') }}</span>
@@ -57,26 +105,59 @@
                         <td><strong>{{ $s->talle?->nombre ?? $s->item?->talle ?? '—' }}</strong></td>
                         <td class="observation-cell">{{ $s->observacion ?: 'Sin observación' }}</td>
 
-                        <td>
+                        <td class="review-cell">
                             <span class="badge badge-{{ strtolower($s->estado) }}">{{ $s->estado }}</span>
 
-                            @if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']))
-                                <form action="{{ route('solicitudes.estado', $s) }}" method="POST" style="margin-top:7px">
-                                    @csrf
-                                    @method('PATCH')
+                            @if($s->estado === 'REVISADO')
+                                <div class="review-audit">
+                                    <strong>{{ $s->revisor?->name ?? 'Usuario no disponible' }}</strong>
+                                    <span>{{ $s->revisado_en?->format('d/m/Y H:i') ?? 'Sin fecha registrada' }}</span>
+                                </div>
+                            @endif
 
-                                    <select
-                                        name="estado"
-                                        class="state-select js-state-select"
-                                        data-current="{{ $s->estado }}"
-                                    >
-                                        @foreach(['REGISTRADO','REVISADO','DESCARTADO'] as $estado)
-                                            <option value="{{ $estado }}" @selected($s->estado === $estado)>
-                                                {{ $estado }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </form>
+                            @if(in_array(auth()->user()->rol, ['ADMIN','SUPERVISOR']))
+                                <div class="review-actions">
+                                    @if($s->estado === 'REGISTRADO')
+                                        <form action="{{ route('solicitudes.revisar', $s) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+
+                                            <button class="btn btn-success btn-sm" type="submit">
+                                                ✓ Revisar
+                                            </button>
+                                        </form>
+
+                                        <form action="{{ route('solicitudes.estado', $s) }}" method="POST" class="js-discard-form">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="estado" value="DESCARTADO">
+
+                                            <button class="btn btn-danger btn-sm" type="submit">
+                                                Descartar
+                                            </button>
+                                        </form>
+                                    @elseif($s->estado === 'REVISADO')
+                                        <form action="{{ route('solicitudes.estado', $s) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="estado" value="REGISTRADO">
+
+                                            <button class="btn btn-sm" type="submit">
+                                                Reabrir
+                                            </button>
+                                        </form>
+                                    @elseif($s->estado === 'DESCARTADO')
+                                        <form action="{{ route('solicitudes.estado', $s) }}" method="POST">
+                                            @csrf
+                                            @method('PATCH')
+                                            <input type="hidden" name="estado" value="REGISTRADO">
+
+                                            <button class="btn btn-sm" type="submit">
+                                                Recuperar
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
                             @endif
                         </td>
                     </tr>
