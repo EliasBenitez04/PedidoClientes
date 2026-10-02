@@ -66,7 +66,6 @@
             </div>
 
             <div class="brand-copy">
-                <strong>GOTITAS</strong>
                 <span>Demanda no cubierta</span>
             </div>
         </div>

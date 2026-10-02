@@ -63,8 +63,8 @@
                 <span class="login-logo-light-fallback">GOTITAS</span>
             </div>
 
-            <h1>GOTITAS</h1>
-            <p class="intro">Demanda no cubierta · Ingresá con el usuario asignado a tu tienda.</p>
+            <h1>Demanda no cubierta</h1>
+            <p class="intro">Ingresá con el usuario asignado a tu tienda.</p>
 
             <form action="{{ route('login.post') }}" method="POST">
                 @csrf
