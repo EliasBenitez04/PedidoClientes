@@ -10,8 +10,8 @@ class CatalogoTalle extends Model
     protected $fillable = ['nombre', 'activo'];
     protected $casts = ['activo' => 'boolean'];
 
-    public function pedidos()
+    public function solicitudes()
     {
-        return $this->hasMany(Pedido::class, 'talle_id');
+        return $this->hasMany(SolicitudCliente::class, 'talle_id');
     }
 }

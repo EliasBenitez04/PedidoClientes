@@ -628,3 +628,9 @@ tbody tr:hover td{background:#fafbfc}
 @media(max-width:760px){
     .select2-container{max-width:100%}
 }
+
+
+/* Estados de demanda no cubierta */
+.badge-registrado{background:var(--info-soft);color:var(--info)}
+.badge-revisado{background:var(--success-soft);color:var(--success)}
+.badge-descartado{background:var(--danger-soft);color:var(--danger)}

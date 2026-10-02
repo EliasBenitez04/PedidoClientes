@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#111827">
-    <title>@yield('title', 'Pedido Clientes') - {{ config('app.name') }}</title>
+    <title>@yield('title', 'Demanda Clientes') - Demanda Clientes</title>
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
@@ -15,24 +15,28 @@
 <div class="app-shell">
     <aside class="sidebar">
         <div class="brand">
-            <div class="brand-mark">PC</div>
+            <div class="brand-mark">DC</div>
             <div class="brand-copy">
-                <strong>Pedido Clientes</strong>
-                <span>Gestión por sucursal</span>
+                <strong>Demanda Clientes</strong>
+                <span>Demanda no cubierta</span>
             </div>
         </div>
 
         <nav class="nav">
             <div class="nav-section">Operación</div>
+
             <a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                 <span class="nav-icon">D</span><span>Dashboard</span>
             </a>
-            <a href="{{ route('pedidos.create') }}" class="nav-link {{ request()->routeIs('pedidos.create') ? 'active' : '' }}">
-                <span class="nav-icon">+</span><span>Nuevo pedido</span>
+
+            <a href="{{ route('solicitudes.create') }}" class="nav-link {{ request()->routeIs('solicitudes.create') ? 'active' : '' }}">
+                <span class="nav-icon">+</span><span>Registrar demanda</span>
             </a>
-            <a href="{{ route('pedidos.index') }}" class="nav-link {{ request()->routeIs('pedidos.index') ? 'active' : '' }}">
-                <span class="nav-icon">P</span><span>Pedidos</span>
+
+            <a href="{{ route('solicitudes.index') }}" class="nav-link {{ request()->routeIs('solicitudes.index') ? 'active' : '' }}">
+                <span class="nav-icon">H</span><span>Historial</span>
             </a>
+
             <a href="{{ route('reportes.index') }}" class="nav-link {{ request()->routeIs('reportes.*') ? 'active' : '' }}">
                 <span class="nav-icon">R</span><span>Reportes</span>
             </a>
@@ -46,9 +50,11 @@
 
             @if(auth()->user()->rol === 'ADMIN')
                 <div class="nav-section">Administración</div>
+
                 <a href="{{ route('usuarios.index') }}" class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
                     <span class="nav-icon">U</span><span>Usuarios y roles</span>
                 </a>
+
                 <a href="{{ route('sucursales.index') }}" class="nav-link {{ request()->routeIs('sucursales.*') ? 'active' : '' }}">
                     <span class="nav-icon">S</span><span>Sucursales</span>
                 </a>
@@ -64,7 +70,9 @@
                         <span>{{ auth()->user()->sucursal?->nombre ?? 'Sin sucursal' }}</span>
                     </div>
                 </div>
+
                 <span class="role-pill">{{ auth()->user()->rol }}</span>
+
                 <form action="{{ route('logout') }}" method="POST" class="logout-form js-confirm-logout">
                     @csrf
                     <button type="submit" class="logout-link">Cerrar sesión</button>
@@ -77,9 +85,12 @@
         <header class="app-topbar">
             <div class="topbar-status">
                 <span class="status-dot"></span>
-                Sistema operativo
+                Registro activo
             </div>
-            <div class="branch-chip">{{ auth()->user()->sucursal?->nombre ?? 'Sin sucursal asignada' }}</div>
+
+            <div class="branch-chip">
+                {{ auth()->user()->sucursal?->nombre ?? 'Sin sucursal asignada' }}
+            </div>
         </header>
 
         <main class="content">
@@ -100,6 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (window.jQuery && $.fn.select2) {
         $('.select2').each(function () {
             const $select = $(this);
+
             $select.select2({
                 width: '100%',
                 placeholder: $select.data('placeholder') || 'Seleccionar...',
@@ -113,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         $('.select2-no-search').each(function () {
             const $select = $(this);
+
             $select.select2({
                 width: '100%',
                 minimumResultsForSearch: Infinity,
@@ -123,6 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const successMessage = @json(session('success'));
+
     if (successMessage && window.Swal) {
         Swal.fire({
             toast: true,
@@ -136,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     const validationErrors = @json($errors->all());
+
     if (validationErrors.length && window.Swal) {
         Swal.fire({
             icon: 'error',
@@ -187,7 +202,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Swal.fire({
                 icon: 'question',
                 title: '¿Cambiar estado?',
-                text: 'El pedido pasará de ' + previous + ' a ' + next + '.',
+                text: 'El registro pasará de ' + previous + ' a ' + next + '.',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, cambiar',
                 cancelButtonText: 'Cancelar',

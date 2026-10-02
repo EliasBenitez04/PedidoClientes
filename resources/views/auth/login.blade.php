@@ -5,14 +5,14 @@
 @section('content')
 <div class="login-page">
     <section class="login-visual">
-        <div class="brand-mark">PC</div>
-        <h2>Pedidos claros.<br>Origen identificado.</h2>
-        <p>Centralizá las solicitudes de clientes y sabé automáticamente qué usuario y qué sucursal registraron cada pedido.</p>
+        <div class="brand-mark">DC</div>
+        <h2>Escuchá lo que<br>el cliente está pidiendo.</h2>
+        <p>Registrá productos que los clientes buscan y no encuentran en el local para convertir faltantes en información comercial.</p>
     </section>
 
     <section class="login-panel">
         <div class="login-card">
-            <h1>Bienvenido</h1>
+            <h1>Demanda Clientes</h1>
             <p class="intro">Ingresá con el usuario asignado a tu tienda.</p>
 
             <form action="{{ route('login.post') }}" method="POST">
@@ -32,7 +32,6 @@
                         required
                         autofocus
                     >
-                    <small class="field-hint">No necesitás correo electrónico para ingresar.</small>
                 </div>
 
                 <div class="field">
@@ -52,10 +51,12 @@
                     Mantener sesión iniciada
                 </label>
 
-                <button class="btn btn-primary btn-lg" style="width:100%" type="submit">Ingresar al sistema</button>
+                <button class="btn btn-primary btn-lg" style="width:100%" type="submit">
+                    Ingresar
+                </button>
             </form>
 
-            <div class="login-footer">Pedido Clientes · Acceso por usuario de tienda</div>
+            <div class="login-footer">Demanda Clientes · Registro de oportunidades no cubiertas</div>
         </div>
     </section>
 </div>
@@ -65,6 +66,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const username = document.getElementById('username');
+
     if (username) {
         username.addEventListener('input', function () {
             this.value = this.value.toUpperCase().replace(/[^A-Z0-9_]/g, '');

@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CatalogoColor;
 use App\Models\CatalogoGrupo;
 use App\Models\CatalogoTalle;
-use App\Models\Pedido;
+use App\Models\SolicitudCliente;
 use App\Models\Sucursal;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,7 +15,7 @@ class ReporteController extends Controller
     public function index(Request $request)
     {
         $query = $this->consulta($request);
-        $pedidos = $query->paginate(50)->withQueryString();
+        $solicitudes = $query->paginate(50)->withQueryString();
 
         $sucursales = auth()->user()->puedeVerTodo()
             ? Sucursal::where('activo', true)->orderBy('nombre')->get()
@@ -30,7 +30,7 @@ class ReporteController extends Controller
         $talles = CatalogoTalle::where('activo', true)->orderBy('nombre')->pluck('nombre');
 
         return view('reportes.index', compact(
-            'pedidos',
+            'solicitudes',
             'sucursales',
             'usuarios',
             'grupos',
@@ -41,25 +41,36 @@ class ReporteController extends Controller
 
     public function exportar(Request $request)
     {
-        $pedidos = $this->consulta($request)->get();
-        $filename = 'reporte_pedidos_'.now()->format('Ymd_His').'.csv';
+        $solicitudes = $this->consulta($request)->get();
+        $filename = 'demanda_no_cubierta_'.now()->format('Ymd_His').'.csv';
 
-        return response()->streamDownload(function () use ($pedidos) {
+        return response()->streamDownload(function () use ($solicitudes) {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF");
-            fputcsv($out, ['ID', 'Fecha', 'Sucursal', 'Usuario', 'Grupo', 'Color', 'Talle', 'Observación', 'Estado'], ';');
 
-            foreach ($pedidos as $pedido) {
+            fputcsv($out, [
+                'ID',
+                'Fecha',
+                'Sucursal',
+                'Usuario',
+                'Grupo',
+                'Color',
+                'Talle',
+                'Observación',
+                'Estado',
+            ], ';');
+
+            foreach ($solicitudes as $solicitud) {
                 fputcsv($out, [
-                    $pedido->id,
-                    $pedido->created_at->format('d/m/Y H:i:s'),
-                    $pedido->sucursal->nombre,
-                    $pedido->usuario->name,
-                    $pedido->grupo?->nombre ?? $pedido->item?->grupo ?? '',
-                    $pedido->color?->nombre ?? $pedido->item?->color ?? '',
-                    $pedido->talle?->nombre ?? $pedido->item?->talle ?? '',
-                    $pedido->observacion,
-                    $pedido->estado,
+                    $solicitud->id,
+                    $solicitud->created_at->format('d/m/Y H:i:s'),
+                    $solicitud->sucursal->nombre,
+                    $solicitud->usuario->name,
+                    $solicitud->grupo?->nombre ?? $solicitud->item?->grupo ?? '',
+                    $solicitud->color?->nombre ?? $solicitud->item?->color ?? '',
+                    $solicitud->talle?->nombre ?? $solicitud->item?->talle ?? '',
+                    $solicitud->observacion,
+                    $solicitud->estado,
                 ], ';');
             }
 
@@ -71,7 +82,14 @@ class ReporteController extends Controller
     {
         $user = auth()->user();
 
-        $query = Pedido::with(['usuario', 'sucursal', 'grupo', 'color', 'talle', 'item'])->latest();
+        $query = SolicitudCliente::with([
+            'usuario',
+            'sucursal',
+            'grupo',
+            'color',
+            'talle',
+            'item',
+        ])->latest();
 
         if (!$user->puedeVerTodo()) {
             $query->where('sucursal_id', $user->sucursal_id);

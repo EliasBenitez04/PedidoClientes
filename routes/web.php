@@ -3,8 +3,8 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogoImportController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\SolicitudClienteController;
 use App\Http\Controllers\SucursalController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -20,17 +20,24 @@ Route::middleware(['auth', 'active'])->group(function () {
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/pedidos', [PedidoController::class, 'index'])->name('pedidos.index');
-    Route::get('/pedidos/nuevo', [PedidoController::class, 'create'])->name('pedidos.create');
-    Route::post('/pedidos', [PedidoController::class, 'store'])->name('pedidos.store');
+    Route::get('/solicitudes', [SolicitudClienteController::class, 'index'])->name('solicitudes.index');
+    Route::get('/solicitudes/nueva', [SolicitudClienteController::class, 'create'])->name('solicitudes.create');
+    Route::post('/solicitudes', [SolicitudClienteController::class, 'store'])->name('solicitudes.store');
 
     Route::get('/reportes', [ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/exportar', [ReporteController::class, 'exportar'])->name('reportes.exportar');
 
+    // Compatibilidad con accesos guardados de la versión anterior.
+    Route::redirect('/pedidos', '/solicitudes');
+    Route::redirect('/pedidos/nuevo', '/solicitudes/nueva');
+
     Route::middleware('role:ADMIN,SUPERVISOR')->group(function () {
+        // Importadores: se mantienen sin cambios.
         Route::get('/catalogo/importar', [CatalogoImportController::class, 'index'])->name('catalogo.importar');
         Route::post('/catalogo/importar', [CatalogoImportController::class, 'importar'])->name('catalogo.importar.post');
-        Route::patch('/pedidos/{pedido}/estado', [PedidoController::class, 'updateEstado'])->name('pedidos.estado');
+
+        Route::patch('/solicitudes/{solicitud}/estado', [SolicitudClienteController::class, 'updateEstado'])
+            ->name('solicitudes.estado');
     });
 
     Route::middleware('role:ADMIN')->group(function () {

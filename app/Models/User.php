@@ -31,9 +31,9 @@ class User extends Authenticatable
         return $this->belongsTo(Sucursal::class);
     }
 
-    public function pedidos()
+    public function solicitudes()
     {
-        return $this->hasMany(Pedido::class);
+        return $this->hasMany(SolicitudCliente::class);
     }
 
     public function esAdmin(): bool
