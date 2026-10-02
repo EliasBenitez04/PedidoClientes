@@ -7,6 +7,8 @@ use App\Models\CatalogoGrupo;
 use App\Models\CatalogoTalle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Throwable;
 
 class CatalogoImportController extends Controller
 {
@@ -25,67 +27,73 @@ class CatalogoImportController extends Controller
     {
         $data = $request->validate([
             'tipo' => ['required', 'in:grupo,color,talle'],
-            'archivo' => ['required', 'file', 'max:10240'],
+            'archivo' => ['required', 'file', 'mimes:xlsx,xls,csv,txt', 'max:10240'],
         ]);
 
         $config = $this->configuracion($data['tipo']);
-        $path = $request->file('archivo')->getRealPath();
-        $handle = fopen($path, 'r');
+        $archivo = $request->file('archivo');
+        $extension = strtolower($archivo->getClientOriginalExtension());
 
-        if (!$handle) {
-            return back()->withErrors(['archivo' => 'No se pudo abrir el archivo.']);
+        try {
+            $filas = in_array($extension, ['xlsx', 'xls'], true)
+                ? $this->leerExcel($archivo->getRealPath())
+                : $this->leerCsv($archivo->getRealPath());
+        } catch (Throwable $e) {
+            report($e);
+
+            return back()->withErrors([
+                'archivo' => 'No se pudo leer el archivo. Verificá que sea un Excel/CSV válido y no esté protegido o dañado.',
+            ]);
         }
 
-        $primeraLinea = fgets($handle);
-        rewind($handle);
-
-        $delimitador = $this->detectarDelimitador($primeraLinea ?: '');
-        $primeraFila = fgetcsv($handle, 0, $delimitador);
-
-        if (!$primeraFila) {
-            fclose($handle);
+        if (empty($filas)) {
             return back()->withErrors(['archivo' => 'El archivo está vacío.']);
         }
 
-        $cabecera = array_map(fn ($v) => $this->normalizarCabecera($v), $primeraFila);
-        $indice = $this->buscarIndice($cabecera, $config['aliases']);
-        $primeraEsCabecera = $indice !== false;
+        [$filaCabecera, $indiceColumna] = $this->encontrarCabecera($filas, $config['aliases']);
 
-        // Si es un archivo de una sola columna sin cabecera, usamos la primera columna.
-        if ($indice === false && count($primeraFila) === 1) {
-            $indice = 0;
-        }
+        if ($filaCabecera === null || $indiceColumna === null) {
+            $columnaUnica = $this->detectarColumnaUnica($filas);
 
-        if ($indice === false) {
-            fclose($handle);
-            return back()->withErrors([
-                'archivo' => 'No encontré la columna '.$config['etiqueta'].'. Usá un archivo con una columna llamada '.$config['cabecera'].'.',
-            ]);
+            if ($columnaUnica !== null) {
+                $filaCabecera = -1;
+                $indiceColumna = $columnaUnica;
+            } else {
+                return back()->withErrors([
+                    'archivo' => 'No encontré la columna '.$config['etiqueta'].'. En Excel puede estar en cualquier columna, pero la cabecera debe decir '.$config['cabecera'].' (por ejemplo: GRUPO).',
+                ]);
+            }
         }
 
         $nuevos = 0;
         $existentes = 0;
         $omitidos = 0;
 
-        $procesar = function (array $fila) use ($indice, $config, &$nuevos, &$existentes, &$omitidos) {
-            $valor = trim((string) ($fila[$indice] ?? ''));
+        $model = $config['model'];
+
+        foreach ($filas as $numeroFila => $fila) {
+            if ($numeroFila <= $filaCabecera) {
+                continue;
+            }
+
+            $valor = trim((string) ($fila[$indiceColumna] ?? ''));
 
             if ($valor === '') {
                 $omitidos++;
-                return;
+                continue;
             }
 
             $valor = mb_strtoupper($valor, 'UTF-8');
-            $model = $config['model'];
 
-            $registro = $model::whereRaw('UPPER(nombre) = ?', [$valor])->first();
+            $registro = $model::whereRaw('UPPER(nombre) = UPPER(?)', [$valor])->first();
 
             if ($registro) {
                 if (!$registro->activo) {
                     $registro->update(['activo' => true]);
                 }
+
                 $existentes++;
-                return;
+                continue;
             }
 
             $model::create([
@@ -94,22 +102,75 @@ class CatalogoImportController extends Controller
             ]);
 
             $nuevos++;
-        };
-
-        if (!$primeraEsCabecera) {
-            $procesar($primeraFila);
         }
-
-        while (($fila = fgetcsv($handle, 0, $delimitador)) !== false) {
-            $procesar($fila);
-        }
-
-        fclose($handle);
 
         return back()->with(
             'success',
             $config['titulo'].' importados: '.$nuevos.' nuevos, '.$existentes.' existentes/reactivados, '.$omitidos.' omitidos.'
         );
+    }
+
+    private function leerExcel(string $path): array
+    {
+        $spreadsheet = IOFactory::load($path);
+        $sheet = $spreadsheet->getActiveSheet();
+
+        // Índices numéricos desde 0 para que Excel y CSV se procesen igual.
+        return $sheet->toArray(null, true, true, false);
+    }
+
+    private function leerCsv(string $path): array
+    {
+        $handle = fopen($path, 'r');
+
+        if (!$handle) {
+            throw new \RuntimeException('No se pudo abrir el archivo CSV.');
+        }
+
+        $primeraLinea = fgets($handle);
+        rewind($handle);
+
+        $delimitador = $this->detectarDelimitador($primeraLinea ?: '');
+        $filas = [];
+
+        while (($fila = fgetcsv($handle, 0, $delimitador)) !== false) {
+            $filas[] = $fila;
+        }
+
+        fclose($handle);
+
+        return $filas;
+    }
+
+    private function encontrarCabecera(array $filas, array $aliases): array
+    {
+        // Buscamos en las primeras 25 filas por si Excel tiene títulos o espacios arriba.
+        foreach (array_slice($filas, 0, 25, true) as $numeroFila => $fila) {
+            foreach ($fila as $indice => $valor) {
+                $normalizado = $this->normalizarCabecera($valor);
+
+                if (in_array($normalizado, $aliases, true)) {
+                    return [$numeroFila, $indice];
+                }
+            }
+        }
+
+        return [null, null];
+    }
+
+    private function detectarColumnaUnica(array $filas): ?int
+    {
+        $indices = [];
+
+        foreach (array_slice($filas, 0, 25) as $fila) {
+            foreach ($fila as $indice => $valor) {
+                if (trim((string) $valor) !== '') {
+                    $indices[$indice] = true;
+                }
+            }
+        }
+
+        return count($indices) === 1 ? (int) array_key_first($indices) : null;
     }
 
     private function configuracion(string $tipo): array
@@ -119,21 +180,21 @@ class CatalogoImportController extends Controller
                 'model' => CatalogoGrupo::class,
                 'titulo' => 'Grupos',
                 'etiqueta' => 'grupo',
-                'cabecera' => 'grupo',
+                'cabecera' => 'GRUPO',
                 'aliases' => ['grupo', 'grupo_plan', 'grupo_de_plan', 'group'],
             ],
             'color' => [
                 'model' => CatalogoColor::class,
                 'titulo' => 'Colores',
                 'etiqueta' => 'color',
-                'cabecera' => 'color',
+                'cabecera' => 'COLOR',
                 'aliases' => ['color', 'colores', 'colour'],
             ],
             'talle' => [
                 'model' => CatalogoTalle::class,
                 'titulo' => 'Talles',
                 'etiqueta' => 'talle',
-                'cabecera' => 'talle',
+                'cabecera' => 'TALLE',
                 'aliases' => ['talle', 'talles', 'talla', 'size'],
             ],
         };
@@ -155,24 +216,14 @@ class CatalogoImportController extends Controller
     private function normalizarCabecera($valor): string
     {
         $valor = preg_replace('/^\xEF\xBB\xBF/', '', (string) $valor);
+        $valor = str_replace("\xC2\xA0", ' ', $valor);
+        $valor = trim($valor);
+        $valor = Str::ascii($valor);
+        $valor = mb_strtolower($valor, 'UTF-8');
+        $valor = preg_replace('/[\s\p{Z}]+/u', '_', $valor);
+        $valor = str_replace(['-', '.', '/'], '_', $valor);
+        $valor = preg_replace('/_+/', '_', $valor);
 
-        return Str::of($valor)
-            ->lower()
-            ->ascii()
-            ->replace([' ', '-', '.'], '_')
-            ->trim()
-            ->toString();
-    }
-
-    private function buscarIndice(array $cabecera, array $aliases)
-    {
-        foreach ($aliases as $alias) {
-            $indice = array_search($alias, $cabecera, true);
-            if ($indice !== false) {
-                return $indice;
-            }
-        }
-
-        return false;
+        return trim($valor, '_');
     }
 }

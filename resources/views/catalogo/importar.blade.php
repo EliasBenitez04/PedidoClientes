@@ -11,11 +11,8 @@
 </div>
 
 <div class="identity" style="margin-bottom:20px">
-    <strong>Tablas utilizadas:</strong>
-    grupos → <strong>grupo</strong>,
-    colores → <strong>color</strong>,
-    talles → <strong>talle</strong>.
-    Cada importador guarda directamente en su tabla correspondiente.
+    <strong>Formatos aceptados:</strong> Excel <strong>.xlsx / .xls</strong>, CSV y TXT.
+    En Excel, la cabecera puede estar en cualquier columna y dentro de las primeras 25 filas.
 </div>
 
 <div class="grid grid-3">
@@ -33,13 +30,13 @@
             <input type="hidden" name="tipo" value="grupo">
             <div class="field">
                 <label>Archivo de grupos</label>
-                <input type="file" name="archivo" accept=".csv,.txt,text/csv,text/plain" required>
-                <small class="field-hint">Columna <strong>grupo</strong> o archivo de una sola columna.</small>
+                <input type="file" name="archivo" accept=".xlsx,.xls,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/plain" required>
+                <small class="field-hint">La cabecera debe decir <strong>GRUPO</strong>. Puede estar en A1, B3, C5, etc.</small>
             </div>
             <button class="btn btn-primary" type="submit">Importar grupos</button>
         </form>
 
-        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">grupo
+        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">GRUPO
 REMERA ECO
 PANTALON
 CAMPERA</pre>
@@ -59,13 +56,13 @@ CAMPERA</pre>
             <input type="hidden" name="tipo" value="color">
             <div class="field">
                 <label>Archivo de colores</label>
-                <input type="file" name="archivo" accept=".csv,.txt,text/csv,text/plain" required>
-                <small class="field-hint">Columna <strong>color</strong> o archivo de una sola columna.</small>
+                <input type="file" name="archivo" accept=".xlsx,.xls,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/plain" required>
+                <small class="field-hint">La cabecera debe decir <strong>COLOR</strong>.</small>
             </div>
             <button class="btn btn-primary" type="submit">Importar colores</button>
         </form>
 
-        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">color
+        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">COLOR
 NEGRO
 BLANCO
 AZUL</pre>
@@ -85,13 +82,13 @@ AZUL</pre>
             <input type="hidden" name="tipo" value="talle">
             <div class="field">
                 <label>Archivo de talles</label>
-                <input type="file" name="archivo" accept=".csv,.txt,text/csv,text/plain" required>
-                <small class="field-hint">Columna <strong>talle</strong> o archivo de una sola columna.</small>
+                <input type="file" name="archivo" accept=".xlsx,.xls,.csv,.txt,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,text/csv,text/plain" required>
+                <small class="field-hint">La cabecera debe decir <strong>TALLE</strong>.</small>
             </div>
             <button class="btn btn-primary" type="submit">Importar talles</button>
         </form>
 
-        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">talle
+        <pre style="margin:18px 0 0;background:#111827;color:#e5e7eb;padding:13px;border-radius:10px;overflow:auto;font-size:11px">TALLE
 S
 M
 L
